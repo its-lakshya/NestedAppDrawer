@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Menu } from "lucide-react";
+import { useState } from "react";
 import { MobileDrawer } from "../navigation/MobileDrawer";
-import Sidebar from "./Sidebar";
 import Header from "./Header";
+import Sidebar from "./Sidebar";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState<boolean>(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Desktop Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} />
 
@@ -26,17 +26,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t flex justify-around items-center h-14 shadow-lg z-40">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-background border-t border-accent flex justify-around items-center h-14 shadow-lg z-40">
         <button
           onClick={() => setMobileDrawerOpen(true)}
-          className="flex flex-col items-center text-gray-600"
+          className="flex flex-col items-center"
         >
-          <Menu className='size-6' />
+          <Menu className="size-6" />
         </button>
       </nav>
 
       {/* Mobile Drawer */}
-      <MobileDrawer open={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} />
+      <MobileDrawer
+        open={mobileDrawerOpen}
+        onClose={() => setMobileDrawerOpen(false)}
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ type SidebarProps = {
 const Sidebar = ({ sidebarOpen }: SidebarProps) => {
   return (
     <aside
-      className={`hidden md:flex bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
+      className={`hidden md:flex max-h-screen bg-background border-r border-accent transition-all duration-300 ease-in-out py-4 ${
         sidebarOpen ? "w-64 opacity-100 rounded-r-4xl shadow" : "w-0 opacity-0"
       } overflow-hidden`}
     >

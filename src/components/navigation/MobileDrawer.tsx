@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { menuData } from "@/lib/menuData";
 import { MenuItem } from "@/types/menu";
@@ -12,24 +12,44 @@ interface MobileDrawerProps {
 }
 
 export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
-  // stack for nested menus
   const [stack, setStack] = useState<MenuItem[][]>([menuData]);
+  const [direction, setDirection] = useState<"forward" | "back">("forward");
   const currentMenu: MenuItem[] = stack[stack.length - 1];
 
-  // navigate deeper
   const handleNavigate = (item: MenuItem): void => {
-    if (item.children && item.children.length > 0) {
+    if (item.children?.length) {
+      setDirection("forward");
       setStack((prev) => [...prev, item.children!]);
     }
   };
 
-  // go back
-  const handleBack = (): void => setStack((prev) => prev.slice(0, -1));
+  const handleBack = (): void => {
+    setDirection("back");
+    setStack((prev) => prev.slice(0, -1));
+  };
 
-  // reset on close
   const handleClose = (): void => {
     onClose();
     setStack([menuData]);
+  };
+
+  // Slide variants
+  const variants = {
+    enter: (dir: "forward" | "back") => ({
+      x: dir === "forward" ? "100%" : "-100%",
+      opacity: 0,
+      position: "absolute" as const,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      position: "relative" as const,
+    },
+    exit: (dir: "forward" | "back") => ({
+      x: dir === "forward" ? "-100%" : "100%",
+      opacity: 0,
+      position: "absolute" as const,
+    }),
   };
 
   return (
@@ -42,59 +62,63 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
           exit={{ opacity: 0 }}
         >
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={handleClose}
-          />
+          <div className="absolute inset-0 bg-black/40" onClick={handleClose} />
 
-          {/* Floating Drawer */}
+          {/* Drawer (stays mounted) */}
           <motion.div
-            className="relative bg-white rounded-2xl shadow-xl w-11/12 mb-20 max-h-[80vh] flex flex-col"
+            className="relative bg-white rounded-2xl shadow-xl w-11/12 mb-16 max-h-[80vh] flex flex-col overflow-hidden"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            onDragEnd={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-              if (info.offset.y > 100) handleClose();
-            }}
           >
-            {/* Drawer Content */}
-            <div className="flex-1 overflow-y-auto p-2">
-
-              {stack.length > 1 && (
-                <button
-                  onClick={handleBack}
-                  className="mb-2 px-3 py-2 flex items-center gap-2 text-sm  hover:bg-gray-100 rounded-md"
+            {/* Sliding Menu Levels */}
+            <div className="relative flex-1 overflow-hidden">
+              <AnimatePresence mode="sync" custom={direction}>
+                <motion.div
+                  key={stack.length}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 p-2 overflow-y-auto no-scrollbar"
                 >
-                  <ChevronLeft className='size-4' /> 
-                  <span>Back</span>
-                </button>
-              )}
-
-              {currentMenu.map((item) => (
-                <button
-                  key={item.title}
-                  onClick={() => handleNavigate(item)}
-                  className="flex items-center justify-between w-full px-3 py-3 text-left hover:bg-gray-50 rounded-md"
-                >
-                  <div className="flex items-center gap-2">
-                    <item.icon className="h-5 w-5 text-gray-500" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">{item.title}</span>
-                      {item.description && (
-                        <span className="text-xs text-gray-500">
-                          {item.description}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {item.children && (
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  {stack.length > 1 && (
+                    <button
+                      onClick={handleBack}
+                      className="mb-2 px-3 py-2 flex items-center gap-2 text-sm hover:bg-accent rounded-md"
+                    >
+                      <ChevronLeft className="size-4" />
+                      <span>Back</span>
+                    </button>
                   )}
-                </button>
-              ))}
+
+                  {currentMenu.map((item) => (
+                    <button
+                      key={item.title}
+                      onClick={() => handleNavigate(item)}
+                      className="flex items-center justify-between w-full px-3 py-3 text-left hover:bg-accent rounded-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <item.icon className="size-[16px] -mt-3" />
+                        <div className="flex flex-col">
+                          <span className="text-sm">{item.title}</span>
+                          {item.description && (
+                            <span className="text-xs text-muted-foreground">
+                              {item.description}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {item.children && (
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
