@@ -62,7 +62,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
           >
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto p-2">
-              {/* If not at root, show back button */}
+
               {stack.length > 1 && (
                 <button
                   onClick={handleBack}
