@@ -1,26 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { MenuItem } from "@/types/menu";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import Logo from "../logo/Logo";
 
 export function SidebarMenu({ items }: { items: MenuItem[] }) {
   return (
     <nav className="w-full h-full flex flex-col">
-      {/* 🔥 Logo Section */}
       <div className="flex items-center gap-2 px-4 py-6">
-        {/* <img
-          src="/logo.png" // 👈 replace with your logo path
-          alt="Company Logo"
-          className="h-10 w-10 rounded-md object-contain"
-        /> */}
-        <span className="text-lg font-bold tracking-wide">
-          MyCompany
-        </span>
+        <Logo />
       </div>
 
       {/* Menu Items */}
-      <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+      <div className="flex-1 overflow-y-auto px-2 space-y-1">
         {items.map((item, idx) => (
           <SidebarItem key={idx} item={item} />
         ))}
@@ -36,14 +29,21 @@ function SidebarItem({ item }: { item: MenuItem }) {
   return (
     <div>
       <button
-        className="flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors"
+        className="flex w-full items-start gap-2 px-3 py-2 rounded-md transition-colors hover:bg-gray-50"
         onClick={() => hasChildren && setOpen(!open)}
       >
-        <item.icon className="h-4 w-4 mr-2" />
-        <span className="flex-1 text-left">{item.title}</span>
+        <item.icon className="h-5 w-5 mt-0.5 text-gray-600" />
+        <div className="flex-1 text-left">
+          <span className="block text-sm font-medium">{item.title}</span>
+          {item.description && (
+            <span className="block text-xs text-gray-500 line-clamp-1">
+              {item.description}
+            </span>
+          )}
+        </div>
         {hasChildren && (
           <ChevronDown
-            className={`h-4 w-4 transition-transform duration-300 ${
+            className={`h-4 w-4 mt-1 shrink-0 transition-transform duration-300 ${
               open ? "rotate-180" : ""
             }`}
           />
